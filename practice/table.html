@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editable HTML Table</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
+</head>
+<body>
+  <div id="spreadsheet"></div>
+  <button id="saveButton">Save</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+  <script>
+    const data = [
+      ['', 'Column 1', 'Column 2', 'Column 3'],
+      ['Row 1', 'Data 1', 'Data 2', 'Data 3'],
+      ['Row 2', 'Data 4', 'Data 5', 'Data 6'],
+      ['Row 3', 'Data 7', 'Data 8', 'Data 9']
+    ];
+
+    const container = document.getElementById('spreadsheet');
+    const hot = new Handsontable(container, {
+      data: data,
+      rowHeaders: true,
+      colHeaders: true,
+      contextMenu: true,
+      licenseKey: 'non-commercial-and-evaluation'
+    });
+
+    function saveData() {
+      const updatedData = hot.getData();
+      console.log('Updated Data:', updatedData);
+      // Save data to server or local storage
+    }
+
+    document.getElementById('saveButton').addEventListener('click', saveData);
+  </script>
+</body>
+</html>
