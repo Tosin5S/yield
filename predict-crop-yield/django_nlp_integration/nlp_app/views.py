@@ -16,6 +16,8 @@ from .models import FieldData, Profile
 from .nlp import predict_from_text, reflect_prediction
 from .forms import UserUpdateForm, ProfileUpdateForm
 from transformers import pipeline
+from django.core.paginator import Paginator
+
 
 
 # Load the trained model pipeline
@@ -352,27 +354,34 @@ def table01(request):
 @login_required
 def table(request):
     # Fetch all field data
-    fielddata = FieldData.objects.all()
-    fields = [field.name for field in FieldData._meta.fields if field.name != "id"]  # Exclude 'id' if needed
+    fielddata_list = FieldData.objects.all()
+    fields = [field.name for field in FieldData._meta.fields if field.name != "id"]
 
-    if request.method == "POST":
-        record_id = request.POST.get("pk")  # Get primary key (row number)
-        form_data = {field: request.POST.get(field, "") for field in fields}  # Collect form data
+    # Pagination
+    paginator = Paginator(fielddata_list, 5)  # Show 5 records per page
+    page_number = request.GET.get("page")
+    fielddata = paginator.get_page(page_number)
 
-        if "create" in request.POST:
-            FieldData.objects.create(**form_data)  # Create new record
-            return redirect("table")
+    # Handle Create operation
+    if request.method == "POST" and "create" in request.POST:
+        new_data = {field: request.POST.get(field, "") for field in fields}
+        FieldData.objects.create(**new_data)
+        return redirect("table")
 
-        elif "update" in request.POST and record_id:
-            fielddata_instance = get_object_or_404(FieldData, pk=record_id)
-            for field, value in form_data.items():
-                setattr(fielddata_instance, field, value)  # Update fields
-            fielddata_instance.save()
-            return redirect("table")
+    # Handle Update operation
+    if request.method == "POST" and "update" in request.POST:
+        record_id = request.POST.get("id")
+        fielddata_instance = get_object_or_404(FieldData, id=record_id)
+        for field in fields:
+            setattr(fielddata_instance, field, request.POST.get(field, getattr(fielddata_instance, field)))
+        fielddata_instance.save()
+        return redirect("table")
 
-        elif "delete" in request.POST and record_id:
-            FieldData.objects.filter(pk=record_id).delete()  # Delete record
-            return redirect("table")
+    # Handle Delete operation
+    if request.method == "POST" and "delete" in request.POST:
+        record_id = request.POST.get("id")
+        FieldData.objects.filter(id=record_id).delete()
+        return redirect("table")
 
     return render(request, "nlp_app/table.html", {"fielddata": fielddata, "fields": fields})
     

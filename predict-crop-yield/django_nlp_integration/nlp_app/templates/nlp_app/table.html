@@ -1,11 +1,54 @@
+{% load custom_filters %}
 
-{% load custom_filters %}  {# Load the custom filter #}
+<style>
+    table {
+        border: 2px solid green;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 2px solid green;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #e6ffe6;
+    }
+
+    .pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+    }
+
+    .pagination li {
+        margin: 0 5px;
+    }
+
+    .pagination a {
+        text-decoration: none;
+        padding: 5px 10px;
+        border: 1px solid green;
+        color: green;
+        border-radius: 5px;
+    }
+
+    .pagination .current {
+        background-color: green;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+</style>
 
 <div class="container mt-4">
     <h2>Field Data Table</h2>
 
-    <!-- Table Displaying Data -->
-    <table class="table table-bordered">
+    <table class="table">
         <thead>
             <tr>
                 <th>Row (PK)</th>
@@ -18,7 +61,7 @@
         <tbody>
             {% for record in fielddata %}
             <tr>
-                <td>{{ record.pk }}</td>  {# Primary Key #}
+                <td>{{ record.pk }}</td>
                 {% for field in fields %}
                     <td data-pk="{{ record.pk }}" data-field="{{ field }}">
                         {{ record|getattr_custom:field }}
@@ -36,6 +79,21 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Pagination Controls -->
+    <ul class="pagination">
+        {% if fielddata.has_previous %}
+            <li><a href="?page=1">First</a></li>
+            <li><a href="?page={{ fielddata.previous_page_number }}">Previous</a></li>
+        {% endif %}
+
+        <li class="current">Page {{ fielddata.number }} of {{ fielddata.paginator.num_pages }}</li>
+
+        {% if fielddata.has_next %}
+            <li><a href="?page={{ fielddata.next_page_number }}">Next</a></li>
+            <li><a href="?page={{ fielddata.paginator.num_pages }}">Last</a></li>
+        {% endif %}
+    </ul>
 
     <!-- Create / Update Form -->
     <form method="POST">
@@ -65,5 +123,3 @@
         {% endfor %}
     }
 </script>
-
-
