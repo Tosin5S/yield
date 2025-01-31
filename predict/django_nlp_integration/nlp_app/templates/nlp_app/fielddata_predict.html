@@ -1,0 +1,15 @@
+{% extends 'base_generic.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Result</title>
+</head>
+<body>
+    <h1>Prediction Result for {{ fielddata.studyName }}</h1>
+    <p><strong>Program Name:</strong> {{ fielddata.programName }}</p>
+    <p><strong>Prediction Result:</strong> {{ prediction_result }}</p>
+    <a href="{% url 'fielddata_list' %}" class="btn">Back to List</a>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% load custom_filters %}
+
+<style>
+    table {
+        border: 2px solid green;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 2px solid green;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #e6ffe6;
+    }
+
+    .pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+    }
+
+    .pagination li {
+        margin: 0 5px;
+    }
+
+    .pagination a {
+        text-decoration: none;
+        padding: 5px 10px;
+        border: 1px solid green;
+        color: green;
+        border-radius: 5px;
+    }
+
+    .pagination .current {
+        background-color: green;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2>Field Data Table</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Row (PK)</th>
+                {% for field in fields %}
+                    <th>{{ field|title }}</th>
+                {% endfor %}
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in fielddata %}
+            <tr>
+                <td>{{ record.pk }}</td>
+                {% for field in fields %}
+                    <td data-pk="{{ record.pk }}" data-field="{{ field }}">
+                        {{ record|getattr_custom:field }}
+                    </td>
+                {% endfor %}
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editRecord({{ record.pk }})">Edit</button>
+                    <form method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ record.pk }}">
+                        <button type="submit" name="delete" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <ul class="pagination">
+        {% if fielddata.has_previous %}
+            <li><a href="?page=1">First</a></li>
+            <li><a href="?page={{ fielddata.previous_page_number }}">Previous</a></li>
+        {% endif %}
+
+        <li class="current">Page {{ fielddata.number }} of {{ fielddata.paginator.num_pages }}</li>
+
+        {% if fielddata.has_next %}
+            <li><a href="?page={{ fielddata.next_page_number }}">Next</a></li>
+            <li><a href="?page={{ fielddata.paginator.num_pages }}">Last</a></li>
+        {% endif %}
+    </ul>
+
+    <!-- Create / Update Form -->
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="id" id="recordPk">
+
+        {% for field in fields %}
+            <div class="mb-2">
+                <label>{{ field|title }}</label>
+                <input type="text" name="{{ field }}" id="{{ field }}" class="form-control">
+            </div>
+        {% endfor %}
+
+        <button type="submit" name="create" class="btn btn-primary">Create</button>
+        <button type="submit" name="update" class="btn btn-success">Update</button>
+    </form>
+</div>
+
+<script>
+    function editRecord(pk) {
+        document.getElementById('recordPk').value = pk;
+        {% for field in fields %}
+            let cell = document.querySelector(`td[data-pk="${pk}"][data-field="{{ field }}"]`);
+            if (cell) {
+                document.getElementById('{{ field }}').value = cell.innerText.trim();
+            }
+        {% endfor %}
+    }
+</script>
