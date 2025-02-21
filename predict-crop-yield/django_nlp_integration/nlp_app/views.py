@@ -155,11 +155,13 @@ def fielddata_list(request):
     y_field = request.GET.get('y_field', 'top_yield')
 
     context = {
-        'fielddata': fielddata,
+        'fielddata': pagination_fielddata,
         'fields': fields,
+        'pagination_fielddata': pagination_fielddata,
         'x_field': x_field,
         'y_field': y_field,
     }
+    
     return render(request, 'nlp_app/fielddata_list.html', context)
 
 '''@login_required

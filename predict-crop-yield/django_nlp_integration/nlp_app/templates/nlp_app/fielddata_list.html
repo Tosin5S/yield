@@ -37,6 +37,39 @@
             </tr>
             {% endfor %}
         </table>
+
+        <style>
+
+        
+            .pagination {
+                margin-top: 20px;
+                display: flex;
+                justify-content: center;
+                list-style: none;
+                padding: 0;
+            }
+        
+            .pagination li {
+                margin: 0 5px;
+            }
+        
+            .pagination a {
+                text-decoration: none;
+                padding: 5px 10px;
+                border: 1px solid green;
+                color: green;
+                border-radius: 5px;
+            }
+        
+            .pagination .current {
+                background-color: green;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+        </style>
+        
+
             <!-- Pagination Controls -->
     <ul class="pagination">
         {% if pagination_fielddata.has_previous %}
