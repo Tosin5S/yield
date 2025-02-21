@@ -3,6 +3,7 @@
 {% load static %}  <!-- Load the static tag library -->
 <!-- templates/nlp_app/fielddata_list.html -->
 {% load fielddata_extras %}
+{% load custom_filters %}
 
 <!DOCTYPE html>
 <html>
@@ -36,6 +37,21 @@
             </tr>
             {% endfor %}
         </table>
+            <!-- Pagination Controls -->
+    <ul class="pagination">
+        {% if pagination_fielddata.has_previous %}
+            <li><a href="?page=1">First</a></li>
+            <li><a href="?page={{ pagination_fielddata.previous_page_number }}">Previous</a></li>
+        {% endif %}
+
+        <li class="current">Page {{ pagination_fielddata.number }} of {{ pagination_fielddata.paginator.num_pages }}</li>
+
+        {% if pagination_fielddata.has_next %}
+            <li><a href="?page={{ pagination_fielddata.next_page_number }}">Next</a></li>
+            <li><a href="?page={{ pagination_fielddata.paginator.num_pages }}">Last</a></li>
+        {% endif %}
+    </ul>
+
         <a class="btn btn-add" href="{% url 'fielddata_create' %}">Add New Field Data</a>
 
         <h2>Select Fields for Scatter Plot</h2>

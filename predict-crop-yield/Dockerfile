@@ -24,7 +24,7 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Set NLTK data path if needed
-ENV NLTK_DATA=/django_nlp_integration/nlp_app/data/nltk_data
+# ENV NLTK_DATA=/django_nlp_integration/nlp_app/data/nltk_data
 
 # Expose port if needed
 EXPOSE 80

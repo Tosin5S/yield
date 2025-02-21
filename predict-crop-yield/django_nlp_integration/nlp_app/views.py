@@ -10,12 +10,12 @@ from django.db.models import FloatField, IntegerField
 import pandas as pd
 import joblib
 import os
-import shap
+#import shap
 from .models import FieldData, Profile
 # from .nlp_utils import explain_record
-from .nlp import predict_from_text, reflect_prediction
+# from .nlp import predict_from_text, reflect_prediction
 from .forms import UserUpdateForm, ProfileUpdateForm
-from transformers import pipeline
+#from transformers import pipeline
 from django.core.paginator import Paginator
 
 
@@ -145,6 +145,11 @@ def index(request):
 def fielddata_list(request):
     fielddata = FieldData.objects.all()
     fields = [f.name for f in FieldData._meta.get_fields() if isinstance(f, FloatField) or isinstance(f, IntegerField)]
+    
+    # Pagination
+    paginator = Paginator(fielddata, 2)  # Show 5 records per page
+    page_number = request.GET.get("page")
+    pagination_fielddata = paginator.get_page(page_number)
     
     x_field = request.GET.get('x_field', 'fresh_storage_root_weight_per_plot')
     y_field = request.GET.get('y_field', 'top_yield')
@@ -358,7 +363,7 @@ def table(request):
     fields = [field.name for field in FieldData._meta.fields if field.name != "id"]
 
     # Pagination
-    paginator = Paginator(fielddata_list, 5)  # Show 5 records per page
+    paginator = Paginator(fielddata_list, 2)  # Show 5 records per page
     page_number = request.GET.get("page")
     fielddata = paginator.get_page(page_number)
 
@@ -523,7 +528,7 @@ def chatbot(request):
 
 
 
-def generate_explanation(features, prediction, shap_values):
+'''def generate_explanation(features, prediction, shap_values):
     truncated_features = {k: features[k] for k in list(features)[:5]}
     truncated_shap_values = shap_values[:5]
     prompt = (
@@ -536,7 +541,7 @@ def generate_explanation(features, prediction, shap_values):
     generator = pipeline("text-generation", model="gpt2", pad_token_id=50256)
     response = generator(prompt, max_new_tokens=100, num_return_sequences=1)
     explanation = response[0]['generated_text'].strip()
-    return explanation
+    return explanation '''
 
 def fielddata_explain(request, pk):
     # Retrieve the FieldData instance by primary key
@@ -649,19 +654,19 @@ def fielddata_explain(request, pk):
     print("Predictions on new data:", new_predictions)
 
     # Create a SHAP explainer for the model
-    explainer = shap.TreeExplainer(model_pipeline.named_steps['regressor'])
+    # explainer = shap.TreeExplainer(model_pipeline.named_steps['regressor'])
 
     # Calculate SHAP values for the prediction
-    shap_values = explainer.shap_values(new_data_preprocessed)    
+    # shap_values = explainer.shap_values(new_data_preprocessed)    
     
     # Prepare data for explanation generation
     features = new_data.iloc[0].to_dict()
     prediction = new_predictions[0]
-    shap_value = shap_values[0]
-    explanation = generate_explanation(features, prediction, shap_value)
+    #shap_value = shap_values[0]
+    #explanation = generate_explanation(features, prediction, shap_value)
 
     # Generate a SHAP summary plot
-    shap.summary_plot(shap_values, new_data_preprocessed, feature_names=preprocessed_feature_names)
+    #shap.summary_plot(shap_values, new_data_preprocessed, feature_names=preprocessed_feature_names)
 
     # Prepare context for rendering the template
     context = {

@@ -1,3 +1,5 @@
+{% extends 'base_generic.html' %}
+{% block content %}
 {% load custom_filters %}
 
 <style>
@@ -94,22 +96,7 @@
             <li><a href="?page={{ fielddata.paginator.num_pages }}">Last</a></li>
         {% endif %}
     </ul>
-
-    <!-- Create / Update Form -->
-    <form method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="id" id="recordPk">
-
-        {% for field in fields %}
-            <div class="mb-2">
-                <label>{{ field|title }}</label>
-                <input type="text" name="{{ field }}" id="{{ field }}" class="form-control">
-            </div>
-        {% endfor %}
-
-        <button type="submit" name="create" class="btn btn-primary">Create</button>
-        <button type="submit" name="update" class="btn btn-success">Update</button>
-    </form>
+    <a class="btn btn-add" href="{% url 'fielddata_create' %}">Add New Field Data</a>
 </div>
 
 <script>
@@ -123,3 +110,4 @@
         {% endfor %}
     }
 </script>
+{% endblock %}
