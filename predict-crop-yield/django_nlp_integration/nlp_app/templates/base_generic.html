@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Crop Yield Prediction System{% endblock %}</title>
+     <!-- Favicon -->
+     <link rel="icon" type="image/png" href="{% static 'icon.png' %}">
     <!-- Existing style.css -->
     <!-- link rel="stylesheet" href="{% static 'css/style.css' %}" -->
     <!-- New global.css for light green theme -->
@@ -13,6 +15,7 @@
 <body style="margin: 20px; padding-top: 80px; padding-bottom: 60px; background-color: #e6ffe6;">
 
     <header style="position: fixed; top: 0; left: 0; right: 0; padding: 10px 20px; z-index: 1000; background-color:#ffffff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)">
+        <img src="{% static 'icon.png' %}" alt="Site Icon" style= "position: fixed; bottom:auto; height: 100px; width: 100px; margin-right: 40px;">
         <h1 style="margin: 0; text-align: center;">Crop Yield Prediction System</h1>
         <nav>
             <ul style="list-style-type: none; padding: 0; margin: 10px 0 0 0; display: flex; justify-content: center; gap: 20px;">
