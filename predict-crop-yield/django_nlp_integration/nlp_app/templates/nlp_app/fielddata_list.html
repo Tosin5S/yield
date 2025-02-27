@@ -8,7 +8,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Field Data List</title>
+    <title>List</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{% static 'css/global.css' %}"> <!-- Link to your global CSS -->
 </head>
@@ -16,7 +16,7 @@
     <div class="container">
         <h1> Table </h1>
         <a class="btn" href="{% url 'table' %}">Table</a>
-        <h1>Field Data List</h1>
+        
         <table class="data-table">
             <tr>
                 <th>Study Name</th>
@@ -85,7 +85,7 @@
         {% endif %}
     </ul>
 
-        <a class="btn btn-add" href="{% url 'fielddata_create' %}">Add New Field Data</a>
+        <a class="btn btn-add" href="{% url 'fielddata_create' %}">Add New Data</a>
 
         <h2>Select Fields for Scatter Plot</h2>
         <form method="get" class="form-inline">

@@ -147,7 +147,7 @@ def fielddata_list(request):
     fields = [f.name for f in FieldData._meta.get_fields() if isinstance(f, FloatField) or isinstance(f, IntegerField)]
     
     # Pagination
-    paginator = Paginator(fielddata, 2)  # Show 5 records per page
+    paginator = Paginator(fielddata, 4)  # Show 4 records per page
     page_number = request.GET.get("page")
     pagination_fielddata = paginator.get_page(page_number)
     
@@ -365,7 +365,7 @@ def table(request):
     fields = [field.name for field in FieldData._meta.fields if field.name != "id"]
 
     # Pagination
-    paginator = Paginator(fielddata_list, 2)  # Show 5 records per page
+    paginator = Paginator(fielddata_list, 4)  # Show 4 records per page
     page_number = request.GET.get("page")
     fielddata = paginator.get_page(page_number)
 
