@@ -30,7 +30,7 @@
     </style>
     </head>
 <body>
-    <h1>{% if fielddata.pk %}Edit{% else %}Create{% endif %}</h1>
+    <h1>{% if fielddata.pk %}Edit{% else %}Add New Data{% endif %}</h1>
     <form method="post">
         {% csrf_token %}
         <table>

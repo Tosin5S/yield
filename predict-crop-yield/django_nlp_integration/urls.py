@@ -15,6 +15,7 @@ urlpatterns = [
     path('chatbot/<int:pk>/', views.chatbot_response, name='chatbot_response'),
     # path('chatbot/', views.chatbot, name='chatbot'),
     path('fielddata/<int:pk>/', views.fielddata_detail, name='fielddata_detail'),
+    path('upload/', views.upload_csv, name='upload_csv'),
     path('fielddata/new/', views.fielddata_create, name='fielddata_create'),
     path('fielddata/<int:pk>/edit/', views.fielddata_update, name='fielddata_update'),
     path('fielddata/<int:pk>/delete/', views.fielddata_delete, name='fielddata_delete'),

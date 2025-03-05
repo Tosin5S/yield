@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
@@ -14,10 +14,12 @@ import os
 from .models import FieldData, Profile
 # from .nlp_utils import explain_record
 # from .nlp import predict_from_text, reflect_prediction
-from .forms import UserUpdateForm, ProfileUpdateForm
+from .forms import UserUpdateForm, ProfileUpdateForm, UploadFileForm
 #from transformers import pipeline
 from django.core.paginator import Paginator
 from datetime import datetime
+import io
+
 
 
 
@@ -185,7 +187,74 @@ def clean_numeric(value, conversion_func):
         value = value.strip()
     return conversion_func(value) if value != '' else 0
 
+# Define the target column name (used during training)
+TARGET_COLUMN = 'fresh root yield|CO_334:0000013'
 
+def upload_csv(request):
+    predictions = None
+    error = None
+    table_html = None
+
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            uploaded_file = request.FILES['file']
+            try:
+                # Read CSV from the uploaded file (including all columns)
+                original_data = pd.read_csv(uploaded_file)
+            except Exception as e:
+                error = f"Error reading CSV: {e}"
+                return render(request, 'mlapp/upload.html', {'form': form, 'error': error})
+            
+            # Prepare data for prediction: extract only the features used during training.
+            numeric_features = model_pipeline.named_steps['preprocessor'].transformers_[0][2]
+            categorical_features = model_pipeline.named_steps['preprocessor'].transformers_[1][2]
+            numeric_features = list(numeric_features) if not isinstance(numeric_features, list) else numeric_features
+            categorical_features = list(categorical_features) if not isinstance(categorical_features, list) else categorical_features
+            all_features = numeric_features + categorical_features
+
+            data_for_prediction = original_data.copy()
+            for col in all_features:
+                if col not in data_for_prediction.columns:
+                    data_for_prediction[col] = 0  # Fill missing feature with default value
+
+            # Reorder columns to match the training data
+            data_for_prediction = data_for_prediction[all_features]
+
+            try:
+                # Compute predictions using the full pipeline (which applies preprocessing then predicts)
+                predictions = model_pipeline.predict(data_for_prediction)
+            except Exception as e:
+                error = f"Error during prediction: {e}"
+                return render(request, 'mlapp/upload.html', {'form': form, 'error': error})
+            
+            # Update or create the target column in the original data with predictions
+            original_data[TARGET_COLUMN] = predictions
+
+            # Check which button was clicked
+            if 'download' in request.POST:
+                csv_buffer = io.StringIO()
+                original_data.to_csv(csv_buffer, index=False)
+                response = HttpResponse(csv_buffer.getvalue(), content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="predictions_with_all_features.csv"'
+                return response
+
+            if 'view' in request.POST:
+                # Convert the DataFrame to an HTML table
+                table_html = original_data.to_html(classes="table table-striped", index=False)
+
+            # Also pass predictions as a list (if you want to display them separately)
+            predictions = predictions.tolist()
+    else:
+        form = UploadFileForm()
+    
+    context = {
+        'form': form,
+        'predictions': predictions,
+        'error': error,
+        'table_html': table_html,
+    }
+    return render(request, 'nlp_app/upload.html', context)
 
 @login_required
 def fielddata_create(request):
