@@ -20,7 +20,7 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
-            <!-- Three buttons: one for predicting, one for downloading, and one for viewing -->
+            <!-- Four buttons: one for predicting, one for downloading, one for viewing, and one for manual entry -->
             <button type="submit" name="predict" class="btn btn-success">Upload and Predict</button>
             <button type="submit" name="download" class="btn btn-success">Download CSV</button>
             <button type="submit" name="view" class="btn btn-success">View Predictions</button>

@@ -204,7 +204,7 @@ def upload_csv(request):
                 original_data = pd.read_csv(uploaded_file)
             except Exception as e:
                 error = f"Error reading CSV: {e}"
-                return render(request, 'mlapp/upload.html', {'form': form, 'error': error})
+                return render(request, 'nlp_app/upload.html', {'form': form, 'error': error})
             
             # Prepare data for prediction: extract only the features used during training.
             numeric_features = model_pipeline.named_steps['preprocessor'].transformers_[0][2]
@@ -226,7 +226,7 @@ def upload_csv(request):
                 predictions = model_pipeline.predict(data_for_prediction)
             except Exception as e:
                 error = f"Error during prediction: {e}"
-                return render(request, 'mlapp/upload.html', {'form': form, 'error': error})
+                return render(request, 'nlp_app/upload.html', {'form': form, 'error': error})
             
             # Update or create the target column in the original data with predictions
             original_data[TARGET_COLUMN] = predictions
