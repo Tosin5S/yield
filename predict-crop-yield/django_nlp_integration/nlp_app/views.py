@@ -19,6 +19,7 @@ from .forms import UserUpdateForm, ProfileUpdateForm, UploadFileForm
 from django.core.paginator import Paginator
 from datetime import datetime
 import io
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
 
 
@@ -194,6 +195,7 @@ def upload_csv(request):
     predictions = None
     error = None
     table_html = None
+    result = None
 
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -228,8 +230,26 @@ def upload_csv(request):
                 error = f"Error during prediction: {e}"
                 return render(request, 'nlp_app/upload.html', {'form': form, 'error': error})
             
+            # Initialize metrics dictionary
+            # metrics = {}
+
+            metrics = getattr(model_pipeline, 'training_metrics', None)
             # Update or create the target column in the original data with predictions
             original_data[TARGET_COLUMN] = predictions
+
+            # Option 1: If you want a single result containing both predictions and metrics,
+            # create a dictionary and pass that to the template.
+            #result = {
+            #    'predictions': predictions.tolist(),
+            #    'metrics': metrics
+            #}
+
+            # Option 2: Alternatively, if you prefer to “append” the metrics directly to the predictions list,
+            # you could do the following. (Note that this mixes numbers with a dict in the same list.)
+            predictions_list = predictions.tolist()
+            predictions_list.append(metrics)
+            result = predictions_list
+
 
             # Check which button was clicked
             if 'download' in request.POST:
@@ -250,7 +270,7 @@ def upload_csv(request):
     
     context = {
         'form': form,
-        'predictions': predictions,
+        'predictions': result,
         'error': error,
         'table_html': table_html,
     }
